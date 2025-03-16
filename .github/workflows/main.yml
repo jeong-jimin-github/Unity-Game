@@ -20,6 +20,7 @@ jobs:
       # Cache 유무 확인 및 복원
       - uses: actions/cache@v4
         with:
+          allowDirtyBuild: true
           customImage: 'unityci/editor:2019.4.40f1-base-3.1' 
           path: source/Library
           key: Library-${{ hashFiles('source/Assets/**', 'source/Packages/**', 'source/ProjectSettings/**') }}
