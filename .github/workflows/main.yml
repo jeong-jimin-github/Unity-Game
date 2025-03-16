@@ -13,7 +13,7 @@ jobs:
       # Gogs Repository Clone (로컬 Gogs 서버에서 Clone)
       - name: Clone Gogs repository
         run: |
-          git clone --branch main http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
           cd source
           git lfs pull # 대용량 파일도 함께 가져옵니다
 
