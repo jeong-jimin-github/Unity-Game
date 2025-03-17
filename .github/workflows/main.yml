@@ -52,18 +52,6 @@ jobs:
           name: Windows Build
           path: Build.zip
 
-  release:
-    name: 🚀 Release Build
-    needs: buildWindows
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: Windows Build
-          path: Build.zip
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
