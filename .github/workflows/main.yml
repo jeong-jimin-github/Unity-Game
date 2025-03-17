@@ -39,11 +39,11 @@ jobs:
           targetPlatform: StandaloneWindows64
 
       - name: Check build output
-        run: ls -R source
+        run: ls -R C:/github/workspace/build
 
       # 빌드된 Artifact 업로드
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows Build
-          path: source/build
+          path: C:/github/workspace/build
