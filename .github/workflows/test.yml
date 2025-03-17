@@ -1,0 +1,120 @@
+name: Automated Build ⭐(test)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # GitHub Actions를 수동으로 실행할 수 있도록 추가
+
+permissions:
+  contents: write
+
+jobs:
+  buildWindows:
+    name: 💻 Windows-64 Bit
+    runs-on: windows-latest
+
+    steps:
+      - name: Clone Gogs repository
+        run: |
+          git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          cd source
+          git lfs pull
+
+      - uses: actions/cache@v4
+        with:
+          path: source/Library
+          key: Library-${{ hashFiles('source/Assets/**', 'source/Packages/**', 'source/ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      - name: Build project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          allowDirtyBuild: true
+          projectPath: source
+          targetPlatform: StandaloneWindows64
+          buildPath: Build
+
+      - name: Check build output
+        run: dir Build
+
+      - name: Compress build output using PowerShell
+        shell: pwsh
+        run: |
+          Compress-Archive -Path Build\* -DestinationPath Build.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows Build
+          path: Build.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Build.zip
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "Release v1.0.${{ github.run_number }}"
+          body: "자동 생성된 Windows 빌드"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  buildMac:
+    name: 🍏 MacOS-64 Bit
+    runs-on: macos-latest
+
+    steps:
+      - name: Clone Gogs repository
+        run: |
+          git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          cd source
+          git lfs pull
+
+      - uses: actions/cache@v4
+        with:
+          path: source/Library
+          key: Library-${{ hashFiles('source/Assets/**', 'source/Packages/**', 'source/ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      - name: Build project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          allowDirtyBuild: true
+          projectPath: source
+          targetPlatform: StandaloneOSX
+          buildPath: Build
+
+      - name: Check build output
+        run: ls -la Build
+
+      - name: Compress build output
+        run: zip -r Build.zip Build/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS Build
+          path: Build.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Build.zip
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "Release v1.0.${{ github.run_number }}"
+          body: "자동 생성된 MacOS 빌드"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
