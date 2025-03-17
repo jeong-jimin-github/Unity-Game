@@ -15,12 +15,11 @@ jobs:
         run: |
           git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
           cd source
-          git lfs pull # 대용량 파일도 함께 가져옵니다
+          git lfs pull # 대용량 파일도 함께 가져옴
 
       # Cache 유무 확인 및 복원
       - uses: actions/cache@v4
         with:
-          customImage: 'unityci/editor:2019.4.40f1-base-3.1' 
           path: source/Library
           key: Library-${{ hashFiles('source/Assets/**', 'source/Packages/**', 'source/ProjectSettings/**') }}
           restore-keys: |
@@ -37,13 +36,15 @@ jobs:
           allowDirtyBuild: true
           projectPath: source
           targetPlatform: StandaloneWindows64
+          buildPath: source/Builds/Windows # 빌드 경로 명확히 지정
 
+      # 빌드 결과물 확인
       - name: Check build output
-        run: ls -R C:/github/workspace/build
+        run: ls -R source/Builds
 
       # 빌드된 Artifact 업로드
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows Build
-          path: C:/github/workspace/build
+          path: source/Builds/Windows
