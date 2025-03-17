@@ -7,17 +7,15 @@ on:
 jobs:
   buildWindows:
     name: 💻 Windows-64 Bit
-    runs-on: windows-latest # Windows 환경 사용
+    runs-on: windows-latest
 
     steps:
-      # Gogs Repository Clone (로컬 Gogs 서버에서 Clone)
       - name: Clone Gogs repository
         run: |
           git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
           cd source
-          git lfs pull # 대용량 파일도 함께 가져옴
+          git lfs pull
 
-      # Cache 유무 확인 및 복원
       - uses: actions/cache@v4
         with:
           path: source/Library
@@ -25,7 +23,6 @@ jobs:
           restore-keys: |
             Library-
 
-      # 빌드 실행
       - name: Build project
         uses: game-ci/unity-builder@v4
         env:
@@ -36,15 +33,37 @@ jobs:
           allowDirtyBuild: true
           projectPath: source
           targetPlatform: StandaloneWindows64
-          buildPath: Build # 빌드 경로 명확히 지정
+          buildPath: Build
 
-      # 빌드 결과물 확인
       - name: Check build output
         run: ls -R
 
-      # 빌드된 Artifact 업로드
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows Build
           path: Build
+
+  release:
+    name: 🚀 Release Build
+    needs: buildWindows
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows Build
+          path: Build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Build/**
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "Release v1.0.${{ github.run_number }}"
+          body: "자동 생성된 빌드"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
