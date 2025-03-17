@@ -38,6 +38,9 @@ jobs:
           projectPath: source
           targetPlatform: StandaloneWindows64
 
+      - name: Check build output
+        run: ls -R source
+
       # 빌드된 Artifact 업로드
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
