@@ -36,15 +36,15 @@ jobs:
           allowDirtyBuild: true
           projectPath: source
           targetPlatform: StandaloneWindows64
-          buildPath: source/Builds/Windows # 빌드 경로 명확히 지정
+          buildPath: source/Build # 빌드 경로 명확히 지정
 
       # 빌드 결과물 확인
       - name: Check build output
-        run: ls -R source/Builds
+        run: ls -R source/Build
 
       # 빌드된 Artifact 업로드
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows Build
-          path: source/Builds/Windows
+          path: source/Build
