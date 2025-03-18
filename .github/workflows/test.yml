@@ -9,9 +9,65 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    name: 💻 Build on Windows for Windows and macOS
+  buildWindows:
+    name: 💻 Windows-64 Bit
     runs-on: windows-latest
+
+    steps:
+      - name: Clone Gogs repository
+        run: |
+          git clone --branch master http://oauth2:${{ secrets.GOGS_TOKEN }}@112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          cd source
+          git lfs pull
+          
+      - uses: actions/cache@v4
+        with:
+          path: source/Library
+          key: Library-${{ hashFiles('source/Assets/**', 'source/Packages/**', 'source/ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      - name: Build project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          allowDirtyBuild: true
+          projectPath: source
+          targetPlatform: StandaloneWindows64
+          buildPath: Build
+
+      - name: Check build output
+        run: dir Build
+
+      - name: Compress build output using PowerShell
+        shell: pwsh
+        run: |
+          Compress-Archive -Path Build\* -DestinationPath Build.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows Build
+          path: Build.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Build.zip
+          tag_name: v1.0.${{ github.run_number }}_Windows
+          release_name: "Release v1.0.${{ github.run_number }}"
+          body: "자동 생성된 Windows 빌드"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  buildMac:
+    name: 🍏 MacOS-64 Bit
+    runs-on: macos-latest
 
     steps:
       - name: Clone Gogs repository
@@ -27,22 +83,8 @@ jobs:
           restore-keys: |
             Library-
 
-      # Windows 빌드
-      - name: Build for Windows
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          allowDirtyBuild: true
-          projectPath: source
-          targetPlatform: StandaloneWindows64
-          buildPath: Build/Windows
-
-      # macOS 빌드
-      - name: Build for macOS
-        uses: game-ci/unity-builder@v4
+      - name: Build project
+        uses: jeong-jimin-github/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -51,42 +93,27 @@ jobs:
           allowDirtyBuild: true
           projectPath: source
           targetPlatform: StandaloneOSX
-          buildPath: Build/MacOS
+          buildPath: Build
 
-      # Windows 빌드 결과 압축
-      - name: Compress Windows build
-        shell: pwsh
-        run: |
-          Compress-Archive -Path Build\Windows\* -DestinationPath Windows_Build.zip
+      - name: Check build output
+        run: ls -la Build
 
-      # macOS 빌드 결과 압축
-      - name: Compress macOS build
-        shell: pwsh
-        run: |
-          Compress-Archive -Path Build\MacOS\* -DestinationPath MacOS_Build.zip
+      - name: Compress build output
+        run: zip -r Build.zip Build/
 
-      # 모든 빌드 아티팩트를 업로드
-      - name: Upload build artifacts
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Build Artifacts
-          path: |
-            Windows_Build.zip
-            MacOS_Build.zip
+          name: MacOS Build
+          path: Build.zip
 
-      # GitHub Release 생성
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            Windows_Build.zip
-            MacOS_Build.zip
-          tag_name: v1.0.${{ github.run_number }}
+          files: Build.zip
+          tag_name: v1.0.${{ github.run_number }}_macOS
           release_name: "Release v1.0.${{ github.run_number }}"
-          body: |
-            - Windows 빌드: Windows_Build.zip
-            - macOS 빌드: MacOS_Build.zip
-            자동 생성된 Windows 및 macOS 빌드입니다.
+          body: "자동 생성된 MacOS 빌드"
           draft: false
           prerelease: false
         env:
