@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Clone Gogs repository
         run: |
-          git clone --branch master ${{ secrets.URL }}.git source
+          git clone --branch main ${{ secrets.URL }}.git source
           cd source
           git lfs pull
           
@@ -72,7 +72,7 @@ jobs:
     steps:
       - name: Clone Gogs repository
         run: |
-          git clone --branch master ${{ secrets.URL }}.git source
+          git clone --branch main ${{ secrets.URL }}.git source
           cd source
           git lfs pull
 
