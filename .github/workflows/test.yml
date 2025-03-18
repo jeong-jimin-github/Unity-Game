@@ -84,7 +84,7 @@ jobs:
             Library-
 
       - name: Build project
-        uses: jeong-jimin-github/unity-builder@v4
+        uses: jeong-jimin-github/unity-builder
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
