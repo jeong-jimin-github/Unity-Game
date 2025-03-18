@@ -1,4 +1,4 @@
-name: Automated Build ⭐(test)
+name: Automated Build
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Clone Gogs repository
         run: |
-          git clone --branch master http://oauth2:${{ secrets.GOGS_TOKEN }}@112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          git clone --branch master ${{ secrets.URL }}.git source
           cd source
           git lfs pull
           
@@ -72,7 +72,7 @@ jobs:
     steps:
       - name: Clone Gogs repository
         run: |
-          git clone --branch master http://oauth2:${{ secrets.GOGS_TOKEN }}@112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          git clone --branch master ${{ secrets.URL }}.git source
           cd source
           git lfs pull
 
