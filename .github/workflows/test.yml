@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Clone Gogs repository
         run: |
-          git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          git clone --branch master http://oauth2:${{ secrets.GOGS_TOKEN }}@112.147.160.124:8080/Kuuhaku/Unity-Game.git source
           cd source
           git lfs pull
-
+          
       - uses: actions/cache@v4
         with:
           path: source/Library
@@ -57,7 +57,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: Build.zip
-          tag_name: v1.0.${{ github.run_number }}
+          tag_name: v1.0.${{ github.run_number }}_Windows
           release_name: "Release v1.0.${{ github.run_number }}"
           body: "자동 생성된 Windows 빌드"
           draft: false
@@ -72,7 +72,7 @@ jobs:
     steps:
       - name: Clone Gogs repository
         run: |
-          git clone --branch master http://112.147.160.124:8080/Kuuhaku/Unity-Game.git source
+          git clone --branch master http://oauth2:${{ secrets.GOGS_TOKEN }}@112.147.160.124:8080/Kuuhaku/Unity-Game.git source
           cd source
           git lfs pull
 
@@ -111,7 +111,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: Build.zip
-          tag_name: v1.0.${{ github.run_number }}
+          tag_name: v1.0.${{ github.run_number }}_macOS
           release_name: "Release v1.0.${{ github.run_number }}"
           body: "자동 생성된 MacOS 빌드"
           draft: false
