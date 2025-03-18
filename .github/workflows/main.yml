@@ -39,16 +39,17 @@ jobs:
       - name: Check build output
         run: dir Build
 
-      - name: Compress build output using PowerShell
-        shell: pwsh
+      - name: Prepare build for release
         run: |
-          Compress-Archive -Path Build\* -DestinationPath Build-Windows.zip
+          cd Build/StandaloneWindows64
+          # PowerShell 명령어로 실행 파일만 압축
+          Compress-Archive -Path * -DestinationPath ../../Windows-Build.zip
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows Build
-          path: Build-Windows.zip
+          path: Build/Windows-Build.zip
 
 
   buildMac:
@@ -83,14 +84,17 @@ jobs:
       - name: Check build output
         run: ls -la Build
 
-      - name: Compress build output
-        run: zip -r Build-MacOS.zip Build/
+      - name: Prepare build for release
+        run: |
+          cd Build/StandaloneOSX
+          # 실행 파일만 포함하도록 압축
+          zip -r ../../MacOS-Build.zip *
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: MacOS Build
-          path: Build-MacOS.zip
+          path: Build/MacOS-Build.zip
 
   createRelease:
     name: Create Release
@@ -113,8 +117,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            windows/Build-Windows.zip
-            macos/Build-MacOS.zip
+            windows/Windows-Build.zip
+            macos/MacOS-Build.zip
           tag_name: v1.0.${{ github.run_number }}
           release_name: "Release v1.0.${{ github.run_number }}"
           body: "자동 생성된 Windows 및 MacOS 빌드"
