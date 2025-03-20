@@ -45,6 +45,9 @@ jobs:
           # PowerShell 명령어로 실행 파일만 압축
           Compress-Archive -Path * -DestinationPath ../../Windows-Build.zip
 
+      - name: Check available disk space
+        run: Get-PSDrive
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -89,6 +92,9 @@ jobs:
           cd Build/StandaloneOSX
           # 실행 파일만 포함하도록 압축
           zip -r ../../MacOS-Build.zip *
+          
+      - name: Check available disk space
+        run: df -h
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -112,6 +118,9 @@ jobs:
         with:
           name: MacOS Build
           path: macos
+
+      - name: Check available disk space
+        run: df -h
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
