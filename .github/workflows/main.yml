@@ -56,8 +56,8 @@ jobs:
 
 
   buildMac:
-    name: MacOS-64 Bit & iOS
-    runs-on: macos-13
+    name: MacOS-Arm64
+    runs-on: macos-latest
 
     steps:
       - name: Clone repository
@@ -73,7 +73,7 @@ jobs:
           restore-keys: |
             Library-
 
-      - name: Build project (macOS)
+      - name: Build project
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -84,31 +84,13 @@ jobs:
           projectPath: source
           targetPlatform: StandaloneOSX
 
-      - name: Build project (iOS)
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          allowDirtyBuild: true
-          projectPath: source
-          targetPlatform: iOS
-
       - name: Check build output
         run: ls -la Build
 
-      - name: Prepare build for release (macOS)
+      - name: Prepare build for release
         run: |
           cd Build/StandaloneOSX
-          # 실행 파일만 포함하도록 압축
           zip -r ../../MacOS-Build.zip *
-
-      - name: Prepare build for release (iOS)
-        run: |
-          cd Build/iOS
-          # 실행 파일만 포함하도록 압축
-          zip -r ../../IOS-Build.zip *
           
       - name: Check available disk space
         run: df -h
@@ -118,12 +100,6 @@ jobs:
         with:
           name: MacOS Build
           path: MacOS-Build.zip
-
-      - name: Upload build artifact (IOS)
-        uses: actions/upload-artifact@v4
-        with:
-          name: IOS Build
-          path: IOS-Build.zip
 
   createRelease:
     name: Create Release
@@ -142,12 +118,6 @@ jobs:
           name: MacOS Build
           path: macos
 
-      - name: Download IOS Build
-        uses: actions/download-artifact@v4
-        with:
-          name: IOS Build
-          path: ios
-
       - name: Check available disk space
         run: df -h
 
@@ -157,7 +127,6 @@ jobs:
           files: |
             windows/Windows-Build.zip
             macos/MacOS-Build.zip
-            ios/IOS-Build.zip
           tag_name: v1.0.${{ github.run_number }}
           release_name: "Release v1.0.${{ github.run_number }}"
           body: "자동 생성된 Windows 및 MacOS 빌드"
