@@ -62,7 +62,7 @@ jobs:
     steps:
       - name: Clone repository
         run: |
-          git clone --branch main ${{ secrets.URL }}.git source
+          git clone --branch main https://${{ secrets.GITLAB_USERNAME }}:${{ secrets.GITLAB_TOKEN }}@${{ secrets.GITLAB_URL }} source
           cd source
           git lfs pull
 
