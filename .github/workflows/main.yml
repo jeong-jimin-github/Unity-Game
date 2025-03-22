@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Clone repository
         run: |
-          git clone --branch main https://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
+          git clone --branch main http://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
           cd source
           git lfs pull
 
@@ -62,7 +62,7 @@ jobs:
     steps:
       - name: Clone repository
         run: |
-          git clone --branch main https://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
+          git clone --branch main http://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
           cd source
           git lfs pull
 
