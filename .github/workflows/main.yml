@@ -56,8 +56,8 @@ jobs:
 
 
   buildMac:
-    name: MacOS-Arm64
-    runs-on: macos-latest
+    name: MacOS-64 Bit
+    runs-on: macos-13
 
     steps:
       - name: Clone repository
