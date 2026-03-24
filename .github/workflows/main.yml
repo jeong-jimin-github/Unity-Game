@@ -15,6 +15,7 @@ jobs:
       - name: Clone repository
         run: |
           git clone --branch main http://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
+          printf ${{ secrets.GIT_URL }}
           cd source
           git lfs pull
 
