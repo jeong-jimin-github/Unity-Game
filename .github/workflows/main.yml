@@ -40,6 +40,24 @@ jobs:
       - name: Check build output
         run: dir Build
 
+      - name: Download and extract llama.cpp (Windows)
+        run: |
+          $ReleaseUrl = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
+          $Release = Invoke-RestMethod -Uri $ReleaseUrl
+          $Asset = $Release.assets | Where-Object { $_.name -match "llama-.*-bin-win-vulkan-x64\.zip" }
+          
+          if (-not $Asset) { 
+            Write-Error "llama.cpp Windows release asset not found."
+            exit 1 
+          }
+          
+          Write-Host "Downloading $($Asset.name) from $($Asset.browser_download_url)..."
+          Invoke-WebRequest -Uri $Asset.browser_download_url -OutFile "llama-win.zip"
+          
+          # Unity 빌드 폴더 최상단에 압축 해제
+          Expand-Archive -Path "llama-win.zip" -DestinationPath "Build/StandaloneWindows64" -Force
+          Remove-Item "llama-win.zip"
+
       - name: Prepare build for release
         run: |
           cd Build/StandaloneWindows64
@@ -88,6 +106,28 @@ jobs:
       - name: Check build output
         run: ls -la Build
 
+      - name: Download and extract llama.cpp (MacOS)
+        run: |
+          # GitHub API를 통해 최신 릴리스의 자산 URL 목록 중 조건에 맞는 첫 번째 항목 추출
+          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | jq -r '.assets[].browser_download_url' | grep -E 'llama-.*-bin-macos-arm64\.(zip|tar\.gz)' | head -n 1)
+          
+          if [ -z "$DOWNLOAD_URL" ]; then 
+            echo "llama.cpp MacOS release asset not found."
+            exit 1 
+          fi
+          
+          echo "Downloading $DOWNLOAD_URL..."
+          curl -L "$DOWNLOAD_URL" -o llama_mac_archive
+          
+          # 확장자에 따라 알맞은 압축 해제 명령어 사용
+          if [[ "$DOWNLOAD_URL" == *".zip" ]]; then
+            unzip -o llama_mac_archive -d Build/StandaloneOSX/
+          else
+            tar -xzf llama_mac_archive -C Build/StandaloneOSX/
+          fi
+          
+          rm llama_mac_archive
+
       - name: Prepare build for release
         run: |
           cd Build/StandaloneOSX
@@ -130,7 +170,7 @@ jobs:
             macos/MacOS-Build.zip
           tag_name: v1.0.${{ github.run_number }}
           release_name: "Release v1.0.${{ github.run_number }}"
-          body: "자동 생성된 Windows 및 MacOS 빌드"
+          body: "자동 생성된 Windows 및 MacOS 빌드 (llama.cpp 최신 바이너리 포함)"
           draft: false
           prerelease: false
         env:
