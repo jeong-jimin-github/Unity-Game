@@ -73,8 +73,8 @@ jobs:
           path: Windows-Build.zip
 
   buildMac:
-    name: MacOS-64 Bit
-    runs-on: macos-13
+    name: MacOS-ARM64
+    runs-on: macos-14
 
     steps:
       - name: Clone repository
