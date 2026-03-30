@@ -15,7 +15,7 @@ jobs:
       - name: Clone repository
         run: |
           # http를 https로 변경하고, 인증 안정성을 위해 oauth2를 사용합니다.
-          git clone --branch main https://oauth2:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
+          git clone --depth 1 --branch main https://oauth2:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
           cd source
           git lfs pull
 
@@ -80,7 +80,7 @@ jobs:
       - name: Clone repository
         run: |
           # Mac 환경에서도 동일하게 https 및 oauth2 인증을 적용합니다.
-          git clone --branch main https://oauth2:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
+          git clone --depth 1 --branch main https://oauth2:${{ secrets.GIT_TOKEN }}@${{ secrets.GIT_URL }} source
           cd source
           git lfs pull
 
